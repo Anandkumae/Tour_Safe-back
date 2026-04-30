@@ -1,9 +1,21 @@
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+
+// Load environment variables
+dotenv.config();
+
 const SOSAlert = require('./src/models/SOSAlert');
 
 async function checkAudioInDatabase() {
   try {
-    await mongoose.connect('mongodb+srv://anand44:Anand44@cluster0.gtg6poj.mongodb.net/?appName=Cluster0');
+    const mongoUri = process.env.MONGODB_URI;
+    if (!mongoUri) {
+      console.error('❌ MONGODB_URI not found in environment variables');
+      console.log('Please set MONGODB_URI in .env file');
+      process.exit(1);
+    }
+    
+    await mongoose.connect(mongoUri);
     
     const alerts = await SOSAlert.find({ 
       'evidence.audioUrl': { $exists: true, $ne: '' } 
